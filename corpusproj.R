@@ -86,6 +86,12 @@ brit_sent_ratio_noStopWords <- brit_scrub %>%
   ungroup() %>%
   mutate(title = reorder(title, positiveratio))
 
+brit_top_pos <- brit_corpus %>%
+  group_by(word) %>% 
+  inner_join(BING_mod) %>%
+  count(sentiment = "positive", sort = TRUE) %>%
+  ungroup() %>% 
+  top_n(20)
 
 
 
