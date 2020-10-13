@@ -52,8 +52,29 @@ brit10 <- brit10[125:11629,]
 brit9 <- gutenberg_download(98, meta_fields = c("title", "author")) # a tale of two cities
 brit9 <- brit9[79:15865,]
 
+Brit1 <- gutenberg_download((768), meta_fields = c("title", "author")) #Wuthering Heights 
+View(Brit1)
 
-brit_corpus <- rbind(brit24,brit23,brit22,brit21,brit20,brit19,brit18,brit17,brit16,brit15,brit14,brit13,brit12,brit11,brit10,brit9) %>% 
+Brit2 <-gutenberg_download((1260), meta_fields = c("title", "author")) #Jane Eyre 
+Brit2 <- Brit2[145:20659,]
+
+Brit3 <-gutenberg_download((969), meta_fields = c("title", "author")) #The Tenant of Wildfell Hall
+Brit3 <- Brit3[433:18061,]
+
+Brit4 <-gutenberg_download((11), meta_fields = c("title", "author")) #Alice's Adventures in Wonderland
+Brit4 <- Brit4[10:3339,]
+
+Brit5 <-gutenberg_download((345), meta_fields = c("title", "author")) #Dracula 
+Brit5 <- Brit5[162:15482,]
+
+Brit6 <- gutenberg_download((174), meta_fields = c("title", "author")) #The Picture of Dorian Gray
+Brit6 <- Brit6[58:8498,]
+
+Brit7 <- gutenberg_download((766), meta_fields = c("title", "author")) #David Copperfield 
+Brit7 <- Brit7[161:38191,]
+
+
+brit_corpus <- rbind(brit24,brit23,brit22,brit21,brit20,brit19,brit18,brit17,brit16,brit15,brit14,brit13,brit12,brit11,brit10,brit9,Brit7,Brit6, Brit5, Brit4, Brit3, Brit2, Brit1) %>% 
   unnest_tokens(word,text)
 
 brit_scrub <- brit_corpus %>%
@@ -64,34 +85,53 @@ brit_wc <- brit_scrub %>%
   top_n(20) %>%
   mutate(word = reorder(word, n))
 
+
 BING_mod <- get_sentiments("bing") %>%
   filter(word != "miss")          # "filter" the word "miss" since it is a major false negative
 
+
 brit_sent_ratio_allWords <- brit_corpus %>%
-  group_by(title) %>%
   inner_join(BING_mod) %>%
   count(sentiment) %>%
   spread(sentiment, n) %>%
   mutate(sentiment = positive - negative) %>%
-  mutate(positiveratio = (positive)/(positive + negative)) %>%
-  mutate(title = reorder(title, positiveratio))
+  mutate(positiveratio = (positive)/(positive + negative))
+
 
 brit_sent_ratio_noStopWords <- brit_scrub %>%
-  group_by(title) %>%
   inner_join(BING_mod) %>%
   count(sentiment) %>%
   spread(sentiment, n) %>%
   mutate(sentiment = positive - negative) %>%
-  mutate(positiveratio = (positive)/(positive + negative)) %>%
-  ungroup() %>%
-  mutate(title = reorder(title, positiveratio))
+  mutate(positiveratio = (positive)/(positive + negative))
+
 
 brit_top_pos <- brit_corpus %>%
-  group_by(word) %>% 
   inner_join(BING_mod) %>%
-  count(sentiment = "positive", sort = TRUE) %>%
+  count(sentiment = "positive") %>%
+  top_n(20)
+
+brit_top_neg <- brit_corpus %>%
+  inner_join(BING_mod) %>%
+  count(sentiment = "negative") %>%
   ungroup() %>% 
   top_n(20)
+  
+
+frank_nrc <- frank %>% 
+  inner_join(nrc) %>% 
+  count(word, sentiment) %>% 
+  group_by(sentiment) %>% 
+  top_n(10) %>% 
+  ungroup() %>% 
+  mutate(word = reorder(word,n))
+
+
+
+
+
+
+
 
 
 
