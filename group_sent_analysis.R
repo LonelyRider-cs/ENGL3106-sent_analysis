@@ -20,7 +20,7 @@ american3 <- gutenberg_download(74, meta_fields = c("title", "author"))
 american3 <- american3[458:8818, ]
 
 american4 <- gutenberg_download(76, meta_fields = c("title", "author"))
-american4 <- american1[552:11980, ]
+american4 <- american4[552:11980, ]
 
 american5 <- gutenberg_download(86, meta_fields = c("title", "author"))
 american5 <- american5[335:12911, ]
@@ -32,7 +32,7 @@ american7 <- gutenberg_download(1900, meta_fields = c("title", "author"))
 american7 <- american7[669:11165, ]
 
 american8 <- gutenberg_download(209, meta_fields = c("title", "author"))
-american8 <- american1[15:4540, ]
+american8 <- american8[15:4540, ]
 
 american9 <- gutenberg_download(2833, meta_fields = c("title", "author"))
 american9 <- american9[575:12846, ]
@@ -50,13 +50,13 @@ american13 <- gutenberg_download(514, meta_fields = c("title", "author"))
 american13 <- american13[74:20628, ]
 
 american14 <- gutenberg_download(5348, meta_fields = c("title", "author"))
-american14 <- american1[63:6978, ]
+american14 <- american14[63:6978, ]
 
 american15 <- gutenberg_download(940, meta_fields = c("title", "author"))
 american15 <- american15[145:15393, ]
 
 american16 <- gutenberg_download(5436, meta_fields = c("title", "author"))
-american16 <- american1[142:8567, ]
+american16 <- american16[142:8567, ]
 
 american17 <- gutenberg_download(51060, meta_fields = c("title", "author"))
 american17 <- american17[121:6503, ]
@@ -71,10 +71,10 @@ american20 <- gutenberg_download(2145, meta_fields = c("title", "author"))
 american20 <- american20[21:24362, ]
 
 american21 <- gutenberg_download(2046, meta_fields = c("title", "author"))
-american21 <- american1[140:5860, ]
+american21 <- american21[140:5860, ]
 
 #bind all the novesl together
-american_corpus <- rbind(american1, american2, american3, american4, american5, american6, american7, american8, american9, american10, american11, american12, american14, american15, american16, american17, american18, american19, american20, american21)
+american_corpus <- rbind(american1, american2, american3, american4, american5, american6, american7, american8, american9, american10, american11, american12, american13, american14, american15, american16, american17, american18, american19, american20, american21)
 #unnest all words
 american_corpus_tokens <- american_corpus %>% unnest_tokens(word, text)
 
@@ -92,15 +92,16 @@ american_wc_20 <- american_corpus_tokens_stop_words_removed %>%
 #by calculating theratio of negativesentiment words to total emotion words
 BING <- get_sentiments("bing")
 
-american_sentiment_ratio <- american_corpus %>% 
+american_sentiment_ratio <- american_corpus_tokens %>% 
   group_by(title) %>% 
   inner_join(BING) %>% 
   count(sentiment) %>% 
   spread(sentiment, n) %>% 
   mutate(sentiment = positive - negative) %>% 
-  mutate(positiveratio = (positive)/(positive + negative)) %>% 
+  mutate(positive_ratio = (positive)/(positive + negative)) %>% 
   ungroup() %>% 
-  mutate(title = reorder(title, positveratio))
+  mutate(title = reorder(title, positive_ratio)) %>% 
+  top_n(-10)
 
 
 
