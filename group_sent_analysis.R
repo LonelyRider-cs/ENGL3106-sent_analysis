@@ -81,14 +81,14 @@ american_corpus_tokens <- american_corpus %>% unnest_tokens(word, text)
 #remove stop words from corpus
 american_corpus_tokens_stop_words_removed <- american_corpus_tokens %>% anti_join(stop_words)
 
-#the top 20 frequently used words in the american corpus
+# A: the top 20 frequently used words in the american corpus
 american_wc_20 <- american_corpus_tokens_stop_words_removed %>% 
   count(word, sort = TRUE) %>% 
   top_n(20) %>% 
   mutate(word = reorder(word, n))
 
 
-#Using the Bing sentiment lexicon, find the ten most negative novels in each corpus 
+#B: Using the Bing sentiment lexicon, find the ten most negative novels in each corpus 
 #by calculating theratio of negativesentiment words to total emotion words
 BING <- get_sentiments("bing")
 
@@ -102,6 +102,48 @@ american_sentiment_ratio <- american_corpus_tokens %>%
   ungroup() %>% 
   mutate(title = reorder(title, positive_ratio)) %>% 
   top_n(-10)
+
+
+ggplot(american_sentiment_ratio, aes(title, positive_ratio)) +
+  geom_point(col="tomato2", size=3) +   # Draw points, specifying point color and size
+  geom_segment(aes(x=title, 
+                   xend=title, 
+                   y=min(positive_ratio), 
+                   yend=max(positive_ratio)), 
+               linetype="dashed", 
+               size=0.1) +              # Draw dashed lines
+  labs(title="Ratio of Positive Words to Total Emotions Words (Bing Lexicon)", 
+       subtitle="Major American Novels Corpus", 
+       caption="source: Project Gutenberg") +  
+  coord_flip()
+  
+
+#C: Using the same sentiment lexicon, determine the overall sentiment of each corpora.
+american_sentiment_corpus <- american_corpus_tokens %>% 
+  inner_join(BING) %>% 
+  count(sentiment) %>% 
+  spread(sentiment, n) %>% 
+  mutate(sentiment = positive - negative) %>% 
+  mutate(positive_ratio = (positive)/(positive + negative))
+  
+ggplot(american_sentiment_corpus, aes(title, positive_ratio)) +
+  geom_point(col="tomato2", size=3) +   # Draw points, specifying point color and size
+  geom_segment(aes(x=title, 
+                   xend=title, 
+                   y=min(positive_ratio), 
+                   yend=max(positive_ratio)), 
+               linetype="dashed", 
+               size=0.1) +              # Draw dashed lines
+  labs(title="Ratio of Positive Words to Total Emotions Words (Bing Lexicon)", 
+       subtitle="Major American Novels Corpus", 
+       caption="source: Project Gutenberg") +  
+  coord_flip()
+
+
+
+
+
+
 
 
 
