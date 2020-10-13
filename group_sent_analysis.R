@@ -125,18 +125,21 @@ american_sentiment_corpus <- american_corpus_tokens %>%
   spread(sentiment, n) %>% 
   mutate(sentiment = positive - negative) %>% 
   mutate(positive_ratio = (positive)/(positive + negative))
+
+#still need plot compairng british and american sentitment
   
-ggplot(american_sentiment_corpus, aes(title, positive_ratio)) +
-  geom_point(col="tomato2", size=3) +   # Draw points, specifying point color and size
-  geom_segment(aes(x=title, 
-                   xend=title, 
-                   y=min(positive_ratio), 
-                   yend=max(positive_ratio)), 
-               linetype="dashed", 
-               size=0.1) +              # Draw dashed lines
-  labs(title="Ratio of Positive Words to Total Emotions Words (Bing Lexicon)", 
-       subtitle="Major American Novels Corpus", 
-       caption="source: Project Gutenberg") +  
+#D: What fifteen words contribute most to the positive and negative scores of eachcorpus
+american_top_15_sentiments <- american_corpus_tokens %>%
+  inner_join(BING) %>%
+  count(word, sort = TRUE) %>%
+  top_n(15) %>%
+  mutate(word = reorder(word, n))
+
+
+ggplot(american_top_15_sentiments, aes(word, n)) +
+  geom_col()+
+  labs(title = "Top BING Words in Major American Novels Corpus",
+       subtitle = "BING sentiment lexicon")+
   coord_flip()
 
 
