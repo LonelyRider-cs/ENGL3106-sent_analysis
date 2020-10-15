@@ -159,15 +159,31 @@ british_corpus_tokens_stop_words_removed <- british_corpus_tokens %>% anti_join(
 
 
 # A: the top 20 frequently used words in the american corpus
+#American
 american_wc_20 <- american_corpus_tokens_stop_words_removed %>% 
   count(word, sort = TRUE) %>% 
   top_n(20) %>% 
   mutate(word = reorder(word, n))
 
+ggplot(american_wc_20, aes(word,n))+
+  geom_col()+
+  ggtitle("Top Words in the American Corpus")+
+  xlab("words")+
+  ylab(NULL)+
+  coord_flip()
+
+#British
 british_wc_20 <- british_corpus_tokens_stop_words_removed %>% 
   count(word, sort = TRUE) %>% 
   top_n(20) %>% 
   mutate(word = reorder(word, n))
+
+ggplot(british_wc_20, aes(word,n))+
+  geom_col()+
+  ggtitle("Top Words in the British Corpus")+
+  xlab("words")+
+  ylab(NULL)+
+  coord_flip()
 
 
 #B: Using the Bing sentiment lexicon, find the ten most negative novels in each corpus 
@@ -195,7 +211,7 @@ ggplot(american_sentiment_ratio, aes(title, positive_ratio)) +
                    yend=max(positive_ratio)), 
                linetype="dashed", 
                size=0.1) +              # Draw dashed lines
-  labs(title="Ratio of Positive Words to Total Emotions Words (Bing Lexicon)", 
+  labs(title="Ratio of Positive Words to Total Emotions Words", 
        subtitle="Major American Novels Corpus", 
        caption="source: Project Gutenberg") +  
   coord_flip()
@@ -221,7 +237,7 @@ ggplot(british_sentiment_ratio, aes(title, positive_ratio)) +
                    yend=max(positive_ratio)), 
                linetype="dashed", 
                size=0.1) +              # Draw dashed lines
-  labs(title="Ratio of Positive Words to Total Emotions Words (Bing Lexicon)", 
+  labs(title="Ratio of Positive Words to Total Emotions Words", 
        subtitle="Major British Novels Corpus", 
        caption="source: Project Gutenberg") +  
   coord_flip()
@@ -242,8 +258,24 @@ british_sentiment_corpus <- british_corpus_tokens %>%
   spread(sentiment, n) %>% 
   mutate(sentiment = positive - negative) %>% 
   mutate(positive_ratio = (positive)/(positive + negative))
-#still need plot compairng british and american sentitment
-  
+
+#graph comparing the the two corpuses overall sentiment
+#first combine necassary data into single data frame
+overall_sentiment <- data.frame("Corpus" = c("American", "British"), "Overall_Sentiment" = c(american_sentiment_corpus$sentiment[1], british_sentiment_corpus$sentiment[1]))
+
+ggplot(overall_sentiment, aes(Corpus, Overall_Sentiment)) +
+  geom_point(col="tomato2", size=3) +   # Draw points, specifying point color and size
+  geom_segment(aes(x=Corpus, 
+                   xend=Corpus, 
+                   y=min(Overall_Sentiment), 
+                   yend=max(Overall_Sentiment)), 
+               linetype="dashed", 
+               size=0.1) +              # Draw dashed lines
+  labs(title="Overall Sentiment of each Corpus", 
+       subtitle="American and British Corpus", 
+       caption="source: Project Gutenberg") +  
+  coord_flip()
+
 #D: What fifteen words contribute most to the positive and negative scores of eachcorpus
 #american
 american_top_15_sentiments <- american_corpus_tokens %>%
@@ -269,7 +301,7 @@ british_top_15_sentiments <- british_corpus_tokens %>%
 
 ggplot(british_top_15_sentiments, aes(word, n)) +
   geom_col()+
-  labs(title = "Top BING Words in Major American Novels Corpus",
+  labs(title = "Top BING Words in Major British Novels Corpus",
        subtitle = "BING sentiment lexicon")+
   coord_flip()
 
