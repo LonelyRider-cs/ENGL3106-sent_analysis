@@ -366,38 +366,34 @@ ggplot(british_Anger, aes(word, n)) +
 nrcDisgust <- NRC %>% 
   filter(sentiment == "disgust")
 
+
 #american
 american_DisgustNovels <- american_corpus_tokens_stop_words_removed %>% 
   group_by(title) %>% 
   inner_join(nrcDisgust) %>% 
-  count(sentiment) %>% 
-  spread(sentiment, n) %>% 
-  mutate(title = reorder(title, disgust))
+  count(sentiment, sort = TRUE) %>% 
+  mutate(sentiment = reorder(sentiment,n))
 
-ggplot(american_DisgustNovels, aes(title, disgust)) +
-  geom_col() +
-  coord_flip() +
-  labs(title = "Sentiment of American Novels",
-       subtitle = "NRC Disgust Sentiment Lexicon",
-       x = "Title",
-       y = "NRC Disgust Sentiment Score")
+
+ggplot(american_DisgustNovels, aes(x = reorder(title,n), y = n))+
+  geom_col()+
+  labs(title = "Novels With The Highest Usage of Digust Words From American Corpus",
+       subtitle = "NRC Sentiment Lexicon", x = "Number of Occurrences", y = "Title")+
+  coord_flip()
 
 #british
 british_DisgustNovels <- british_corpus_tokens_stop_words_removed %>% 
   group_by(title) %>% 
   inner_join(nrcDisgust) %>% 
-  count(sentiment) %>% 
-  spread(sentiment, n) %>% 
-  ungroup() %>% 
-  mutate(title = reorder(title, disgust))
+  count(sentiment, sort = TRUE) %>% 
+  mutate(sentiment = reorder(sentiment,n))
 
-ggplot(british_DisgustNovels, aes(title, disgust)) +
-  geom_col() +
-  coord_flip() +
-  labs(title = "Sentiment of British Novels",
-       subtitle = "NRC Disgust Sentiment Lexicon",
-       x = "Title",
-       y = "NRC Disgust Sentiment Score")
+
+ggplot(british_DisgustNovels, aes(x = reorder(title,n), y = n))+
+  geom_col()+
+  labs(title = "Novels With The Highest Usage of Digust Words From British Corpus",
+       subtitle = "NRC Sentiment Lexicon", x = "Number of Occurrences", y = "Title")+
+  coord_flip()
 
 #G: Using the AFINN sentiment lexicon, find the five most positive and negative novels 
 #in your combined corpora.(AFINN)
