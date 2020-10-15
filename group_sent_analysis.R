@@ -404,7 +404,7 @@ ggplot(british_DisgustNovels, aes(title, disgust)) +
 afinn <- lexicon_afinn()
 modAfinn <- afinn %>% 
   filter(word != "miss")
-#american
+
 american_Afinn <- american_corpus_tokens_stop_words_removed %>% 
   group_by(title) %>% 
   inner_join(modAfinn) %>% 
@@ -412,13 +412,12 @@ american_Afinn <- american_corpus_tokens_stop_words_removed %>%
   ungroup() %>% 
   mutate(title = reorder(title, sentiment))
 
-ggplot(american_Afinn, aes(title, sentiment)) +
-  geom_col() +
-  coord_flip() +
-  labs(title = "Sentiment of American Novels",
-       subtitle = "AFINN Sentiment Lexicon",
-       x = "Title",
-       y = "AFINN Sentiment Score")
+ggplot(american_Afinn, aes(title,sentiment))+
+  geom_col()+
+  labs(title = "Top Positive/Negative Afinn Sentiment Novels in Major American Novels Corpus",
+       subtitle = "Afinn sentiment lexicon")+
+  coord_flip()
+
 
 #british
 british_Afinn <- british_corpus_tokens_stop_words_removed %>% 
@@ -428,11 +427,8 @@ british_Afinn <- british_corpus_tokens_stop_words_removed %>%
   ungroup() %>% 
   mutate(title = reorder(title, sentiment))
 
-
-ggplot(british_Afinn, aes(title, sentiment)) +
-  geom_col() +
-  coord_flip() +
-  labs(title = "Sentiment of British Novels",
-       subtitle = "AFINN Sentiment Lexicon",
-       x = "Title",
-       y = "AFINN Sentiment Score")
+ggplot(british_Afinn, aes(title,sentiment))+
+  geom_col()+
+  labs(title = "Top Positive/Negative Afinn Sentiment Novels in Major British Novels Corpus",
+       subtitle = "Afinn sentiment lexicon")+
+  coord_flip()
